@@ -17,5 +17,5 @@ This project aims to digitize the workflow of ASHA (Accredited Social Health Act
 
 ⚙️ Setup Instructions
 ```bash
-# Clone the repository
+# 1. Clone the repository
 https://github.com/mayureshpatil96/SIH2025-asha-health-records-app.git
