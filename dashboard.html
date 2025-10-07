@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard - ASHA Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <script>window.page = 'dashboard';</script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="masthead">
+    <div class="container masthead-inner">
+      <div class="emblem" aria-hidden="true"></div>
+      <div class="govtext">
+        <strong>Ministry of Health & Family Welfare</strong><br>
+        Government of India
+      </div>
+    </div>
+  </div>
+  <div class="tricolor"></div>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">ASHA Platform</a>
+      <nav class="nav" aria-label="Primary">
+        <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu">☰</button>
+        <ul id="nav-menu" class="nav-menu">
+          <li><a href="features.html">Features</a></li>
+          <li><a href="dashboard.html" class="active">Dashboard</a></li>
+          <li><a href="admin.html">Admin</a></li>
+          <li><a href="login.html" class="btn btn-ghost">Logout</a></li>
+        </ul>
+      </nav>
+      <div class="actions">
+        <button id="themeToggle" class="icon-btn" aria-label="Toggle theme">🌓</button>
+        <button class="icon-btn" aria-label="Notifications">🔔</button>
+        <input id="search" placeholder="Search" class="icon-btn" style="width:160px;" />
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="dashboard">
+    <div class="container">
+      <div class="toolbar">
+        <h1>Welcome, ASHA Worker</h1>
+        <div>
+          <a href="#" class="btn btn-primary">Submit Report</a>
+          <a href="#" class="btn btn-outline">View Tasks</a>
+        </div>
+      </div>
+
+      <div class="grid three">
+        <div class="stat">
+          <h3>Attendance</h3>
+          <p class="lead"><strong id="attendanceRate">--</strong></p>
+        </div>
+        <div class="stat">
+          <h3>Assigned Tasks</h3>
+          <ul id="taskList" class="muted" style="list-style:none; padding:0; margin:0;"></ul>
+        </div>
+        <div class="stat">
+          <h3>Alerts</h3>
+          <ul style="list-style:none; padding:0; margin:0;">
+            <li>Immunization camp on Friday</li>
+            <li>Follow-up due: Ward 2</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 style="margin-top:28px;">Recent Reports</h2>
+      <table class="table" role="table">
+        <thead><tr><th>Beneficiary</th><th>Service</th><th>Date</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Meera</td><td>ANC</td><td>2025-10-05</td><td>Submitted</td></tr>
+          <tr><td>Ravi</td><td>Immunization</td><td>2025-10-03</td><td>Submitted</td></tr>
+          <tr><td>Radha</td><td>PNC</td><td>2025-10-02</td><td>Pending</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container center muted">© 2025 ASHA Platform</div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
+
+
