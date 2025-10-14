@@ -294,9 +294,7 @@ docker run -p 5000:5000 asha-health-records
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -305,12 +303,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Open source community
 - Healthcare technology contributors
 
-## 📞 Support
-
-For support and questions:
-- **Email**: support@asha-health-records.gov.in
-- **Documentation**: [Wiki](https://github.com/your-username/asha-health-records-app/wiki)
-- **Issues**: [GitHub Issues](https://github.com/your-username/asha-health-records-app/issues)
 
 ## 🔮 Roadmap
 
