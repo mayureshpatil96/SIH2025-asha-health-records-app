@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
-const Patient = require('../models/Patient');
+// const Patient = require('../models/Patient'); // Disabled for demo mode
 const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
 
@@ -41,8 +41,9 @@ router.post('/', [
     // Generate unique health ID
     const healthId = `ASHA-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
 
-    // Create patient object
+    // Create patient object (demo mode - no database save)
     const patientData = {
+      _id: Date.now().toString(),
       healthId,
       fullName,
       dateOfBirth,
@@ -62,8 +63,8 @@ router.post('/', [
       status: 'active'
     };
 
-    const patient = new Patient(patientData);
-    await patient.save();
+    // In demo mode, just return the patient data without saving
+    const patient = patientData;
 
     res.status(201).json({
       success: true,
@@ -106,15 +107,34 @@ router.get('/', auth, async (req, res) => {
       ];
     }
 
-    // Get patients with pagination
-    const patients = await Patient.find(query)
-      .select('healthId fullName phone gender dateOfBirth address photo registrationDate status')
-      .sort({ registrationDate: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean();
+    // Demo mode - return mock patients data
+    const mockPatients = [
+      {
+        _id: '1',
+        healthId: 'ASHA-001',
+        fullName: 'Priya Sharma',
+        phone: '+91 9876543210',
+        gender: 'female',
+        dateOfBirth: '1990-05-15',
+        address: { fullAddress: 'Village A, Block B, District C' },
+        registrationDate: new Date(),
+        status: 'active'
+      },
+      {
+        _id: '2',
+        healthId: 'ASHA-002',
+        fullName: 'Rajesh Kumar',
+        phone: '+91 9876543211',
+        gender: 'male',
+        dateOfBirth: '1985-03-20',
+        address: { fullAddress: 'Village B, Block C, District D' },
+        registrationDate: new Date(),
+        status: 'active'
+      }
+    ];
 
-    const total = await Patient.countDocuments(query);
+    const patients = mockPatients;
+    const total = mockPatients.length;
 
     res.json({
       success: true,
@@ -139,15 +159,32 @@ router.get('/', auth, async (req, res) => {
 // @access  Private (ASHA workers)
 router.get('/:id', auth, async (req, res) => {
   try {
-    const patient = await Patient.findById(req.params.id);
-    
-    if (!patient) {
-      return res.status(404).json({ message: 'Patient not found' });
-    }
+    // Demo mode - return mock patient data
+    const mockPatient = {
+      _id: req.params.id,
+      healthId: 'ASHA-001',
+      fullName: 'Priya Sharma',
+      phone: '+91 9876543210',
+      gender: 'female',
+      dateOfBirth: '1990-05-15',
+      address: { 
+        fullAddress: 'Village A, Block B, District C',
+        coordinates: { latitude: 28.6139, longitude: 77.2090 }
+      },
+      medicalHistory: {
+        existingConditions: [],
+        familyHistory: [],
+        currentMedications: [],
+        allergies: [],
+        bloodGroup: 'B+'
+      },
+      registrationDate: new Date(),
+      status: 'active'
+    };
 
     res.json({
       success: true,
-      patient
+      patient: mockPatient
     });
 
   } catch (error) {
@@ -161,15 +198,22 @@ router.get('/:id', auth, async (req, res) => {
 // @access  Private (ASHA workers)
 router.get('/health-id/:healthId', auth, async (req, res) => {
   try {
-    const patient = await Patient.findOne({ healthId: req.params.healthId });
-    
-    if (!patient) {
-      return res.status(404).json({ message: 'Patient not found' });
-    }
+    // Demo mode - return mock patient data
+    const mockPatient = {
+      _id: '1',
+      healthId: req.params.healthId,
+      fullName: 'Priya Sharma',
+      phone: '+91 9876543210',
+      gender: 'female',
+      dateOfBirth: '1990-05-15',
+      address: { fullAddress: 'Village A, Block B, District C' },
+      registrationDate: new Date(),
+      status: 'active'
+    };
 
     res.json({
       success: true,
-      patient
+      patient: mockPatient
     });
 
   } catch (error) {
@@ -197,13 +241,7 @@ router.put('/:id', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const patient = await Patient.findById(req.params.id);
-    
-    if (!patient) {
-      return res.status(404).json({ message: 'Patient not found' });
-    }
-
-    // Update fields
+    // Demo mode - simulate patient update
     const updateData = req.body;
     
     if (req.file) {
@@ -214,11 +252,14 @@ router.put('/:id', [
     updateData.lastModified = new Date();
     updateData.modifiedBy = req.user.id;
 
-    const updatedPatient = await Patient.findByIdAndUpdate(
-      req.params.id,
-      { $set: updateData },
-      { new: true, runValidators: true }
-    );
+    const updatedPatient = {
+      _id: req.params.id,
+      ...updateData,
+      healthId: 'ASHA-001',
+      fullName: updateData.fullName || 'Priya Sharma',
+      phone: updateData.phone || '+91 9876543210',
+      status: 'active'
+    };
 
     res.json({
       success: true,
@@ -242,18 +283,7 @@ router.delete('/:id', auth, async (req, res) => {
       return res.status(403).json({ message: 'Access denied. Supervisor role required.' });
     }
 
-    const patient = await Patient.findById(req.params.id);
-    
-    if (!patient) {
-      return res.status(404).json({ message: 'Patient not found' });
-    }
-
-    // Soft delete - mark as inactive
-    patient.status = 'inactive';
-    patient.deletedAt = new Date();
-    patient.deletedBy = req.user.id;
-    
-    await patient.save();
+    // Demo mode - simulate patient deletion
 
     res.json({
       success: true,
@@ -279,45 +309,21 @@ router.get('/statistics/overview', auth, async (req, res) => {
     if (block) locationFilter['address.block'] = block;
     if (village) locationFilter['address.village'] = village;
 
-    const [
-      totalPatients,
-      activePatients,
-      newPatientsThisMonth,
-      patientsByGender,
-      patientsByAgeGroup
-    ] = await Promise.all([
-      Patient.countDocuments({ ...locationFilter }),
-      Patient.countDocuments({ ...locationFilter, status: 'active' }),
-      Patient.countDocuments({
-        ...locationFilter,
-        registrationDate: {
-          $gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-        }
-      }),
-      Patient.aggregate([
-        { $match: locationFilter },
-        { $group: { _id: '$gender', count: { $sum: 1 } } }
-      ]),
-      Patient.aggregate([
-        { $match: locationFilter },
-        {
-          $group: {
-            _id: {
-              $switch: {
-                branches: [
-                  { case: { $lte: [{ $divide: [{ $subtract: [new Date(), '$dateOfBirth'] }, 365 * 24 * 60 * 60 * 1000] }, 5] }, then: '0-5' },
-                  { case: { $lte: [{ $divide: [{ $subtract: [new Date(), '$dateOfBirth'] }, 365 * 24 * 60 * 60 * 1000] }, 18] }, then: '6-18' },
-                  { case: { $lte: [{ $divide: [{ $subtract: [new Date(), '$dateOfBirth'] }, 365 * 24 * 60 * 60 * 1000] }, 45] }, then: '19-45' },
-                  { case: { $lte: [{ $divide: [{ $subtract: [new Date(), '$dateOfBirth'] }, 365 * 24 * 60 * 60 * 1000] }, 60] }, then: '46-60' }
-                ],
-                default: '60+'
-              }
-            },
-            count: { $sum: 1 }
-          }
-        }
-      ])
-    ]);
+    // Demo mode - return mock statistics
+    const totalPatients = 150;
+    const activePatients = 145;
+    const newPatientsThisMonth = 12;
+    const patientsByGender = [
+      { _id: 'female', count: 85 },
+      { _id: 'male', count: 65 }
+    ];
+    const patientsByAgeGroup = [
+      { _id: '0-5', count: 25 },
+      { _id: '6-18', count: 30 },
+      { _id: '19-45', count: 60 },
+      { _id: '46-60', count: 25 },
+      { _id: '60+', count: 10 }
+    ];
 
     res.json({
       success: true,
@@ -360,15 +366,10 @@ router.get('/export/csv', auth, async (req, res) => {
     if (block) locationFilter['address.block'] = block;
     if (village) locationFilter['address.village'] = village;
 
-    const patients = await Patient.find(locationFilter)
-      .select('healthId fullName dateOfBirth gender phone address.fullAddress registrationDate')
-      .sort({ registrationDate: -1 });
-
-    // Convert to CSV
+    // Demo mode - return mock CSV data
     const csvHeader = 'Health ID,Full Name,Date of Birth,Gender,Phone,Address,Registration Date\n';
-    const csvData = patients.map(patient => 
-      `${patient.healthId},${patient.fullName},${patient.dateOfBirth},${patient.gender},${patient.phone},"${patient.address.fullAddress}",${patient.registrationDate}`
-    ).join('\n');
+    const csvData = `ASHA-001,Priya Sharma,1990-05-15,female,+91 9876543210,"Village A, Block B, District C",${new Date().toISOString()}
+ASHA-002,Rajesh Kumar,1985-03-20,male,+91 9876543211,"Village B, Block C, District D",${new Date().toISOString()}`;
 
     const csv = csvHeader + csvData;
 
